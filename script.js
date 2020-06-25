@@ -1,4 +1,5 @@
 const MAIN_CONTAINER = document.getElementById("main-container");
+let labels = []
 
 function createElements() {
 	let numElements = Math.floor(Math.random() * 5) + 1;
@@ -11,6 +12,8 @@ function createElements() {
 	}
 
 	MAIN_CONTAINER.appendChild(groupDiv);
+	
+	getElementBounds(groupDiv);
 }
 
 function chooseElement() {
@@ -45,6 +48,26 @@ function createString(length) {
 	}
 
 	return str;
+}
+
+
+function getElementBounds(group) {
+	for (let child of group.children) {
+
+		let bounds = child.getBoundingClientRect();
+		let data = {
+			type: (child.tagName.toLowerCase() === "input") ? "TEXTBOX" : child.tagName,
+			bounds: {
+				top: bounds.top,
+				bottom: bounds.bottom,
+				left: bounds.left,
+				right: bounds.right
+			},
+		}
+
+		labels.push(data);
+	}
+
 }
 
 createInterface(10);
