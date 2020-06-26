@@ -1,5 +1,7 @@
+const ipc = require("electron").ipcRenderer;
+
 const MAIN_CONTAINER = document.getElementById("main-container");
-let labels = []
+let labels = [];
 
 function createElements() {
 	let numElements = Math.floor(Math.random() * 5) + 1;
@@ -12,8 +14,9 @@ function createElements() {
 	}
 
 	MAIN_CONTAINER.appendChild(groupDiv);
-	
+
 	getElementBounds(groupDiv);
+	sendLabels();
 }
 
 function chooseElement() {
@@ -27,6 +30,7 @@ function chooseElement() {
 		case 2:
 			let textbox = document.createElement("input");
 			textbox.type = "text";
+			textbox.style.width = `${Math.floor(Math.random() * 150 + 50)}px`;
 			return textbox;
 		case 3:
 			let button = document.createElement("button");
@@ -50,24 +54,25 @@ function createString(length) {
 	return str;
 }
 
-
 function getElementBounds(group) {
 	for (let child of group.children) {
-
 		let bounds = child.getBoundingClientRect();
 		let data = {
-			type: (child.tagName.toLowerCase() === "input") ? "TEXTBOX" : child.tagName,
+			type: child.tagName.toLowerCase() === "input" ? "TEXTBOX" : child.tagName,
 			bounds: {
 				top: bounds.top,
 				bottom: bounds.bottom,
 				left: bounds.left,
-				right: bounds.right
+				right: bounds.right,
 			},
-		}
+		};
 
 		labels.push(data);
 	}
+}
 
+function sendLabels() {
+	ipc.send("sendLabels", labels);
 }
 
 createInterface(10);
