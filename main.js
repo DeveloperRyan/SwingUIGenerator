@@ -87,11 +87,23 @@ function writeManifest(imageNumber, writeStream, bounds) {
 
 app.whenReady().then(function () {
     createWindow();
-    takeScreenshot(5);
+    takeScreenshot(100);
 });
 
 async function wait(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
+}
+
+function GetFormattedDateTime() {
+    let now = new Date();
+    let month = ("0" + (now.getMonth() + 1)).slice(-2);
+    let day = ("0" + now.getDate()).slice(-2);
+    let year = now.getFullYear();
+    let hour = ("0" + (now.getHours() + 1)).slice(-2);
+    let minute = ("0" + now.getMinutes()).slice(-2);
+    let second = ("0" + now.getSeconds()).slice(-2);
+
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 }
