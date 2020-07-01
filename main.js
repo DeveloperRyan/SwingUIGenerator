@@ -8,64 +8,90 @@ let win;
 
 // Create the Electron app window
 function createWindow() {
-	win = new BrowserWindow({
-		width: 735,
-		height: 750,
-		autoHideMenuBar: true,
-		fullscreen: true,
-		x: 0,
-		y: 0,
-		webPreferences: {
-			nodeIntegration: true,
-		},
-	});
+    win = new BrowserWindow({
+        width: 700,
+        height: 700,
+        autoHideMenuBar: true,
+        fullscreen: true,
+        x: 0,
+        y: 0,
+        webPreferences: {
+            nodeIntegration: true,
+        },
+    });
 
-	win.loadFile("index.html");
+    win.loadFile("index.html");
 }
 
-// Get the labels from the renderer
-let labels = ipc.on("sendLabels", (labels) => {
-	return labels;
-});
-
-// Write all of the label data, call screenshots.py, and reload the page 
+// Write all of the label data, call screenshots.py, and reload the page
 async function takeScreenshot(numPhotos) {
-	let stream = fs.createWriteStream("labels.manifest", {flags: 'a'});
+    let stream = fs.createWriteStream("labels.manifest", { flags: "a" });
 
-	for (let i = 0; i < numPhotos; i++) {
-		await new Promise((resolve) =>
-			setTimeout(() => {
-				writeManifest(i, stream);
-				spawn("python", ["screenshot.py", i.toString()]);
-				await win.reload();
-				resolve();
-			}, 150)
-		);
-	}
+    for (let i = 0; i < numPhotos; i++) {
+        await new Promise((resolve, reject) => {
+            ipc.once("sendLabels", async (event, data, err) => {
+                if (err) reject(err);
+
+                writeManifest(i, stream, data);
+                spawn("python", ["screenshot.py", i.toString()]);
+                await wait(300);
+
+                resolve();
+            });
+        });
+        await win.reload();
+    }
 }
 
-function writeManifest(imageNumber, writeStream) {
-		// Object fields have to be declared as such due to having hyphens in the names.
-		let imageData = {};
-		imageData['source-ref'] = `s3://bucket/unlabeled/${i}.png`;
-		imageData['bounding-box'] = {
-			image_size: [{ // Size of the original image
-				width: 750,
-				height: 765,
-				depth: 3 // Depth represents the color depth, 3 = RGB.
-			}],
-			annotations: [
-				// Add these after?
-			]
-		};
+function writeManifest(imageNumber, writeStream, bounds) {
+    // Object fields have to be declared as such due to having hyphens in the names.
+    try {
+        let manifest = {};
+        manifest["source-ref"] = `s3://bucket/labeled/${imageNumber}.png`;
+        (manifest["bounding-box"] = {
+            image_size: [
+                {
+                    // Size of the original image
+                    width: 750,
+                    height: 765,
+                    depth: 3, // Depth represents the color depth, 3 = RGB.
+                },
+            ],
+            annotations: [],
+        }),
+            (manifest["bounding-box-metadata"] = {
+                type: "groundtruth/object-detection",
+                objects: [],
+            });
+        manifest["bounding-box-metadata"]["class-map"] = {
+            0: "button",
+            1: "textbox",
+        };
+        manifest["bounding-box-metadata"]["human-annotated"] = "yes";
+        manifest["bounding-box-metadata"]["creation-date"] = Date.now(); // TODO: Make this YYYY-MM-DD HH:MM:SS
+        manifest["bounding-box-metadata"]["job-name"] = "ATAK";
 
-		imageData['bounding-box-metadata'] = {}
+        for (let i = 0; i < bounds.length; i++) {
+            manifest["bounding-box-metadata"]["objects"].push({ confidence: 1 });
+        }
 
-	let labelData = {}
-	writeStream.write()
+        for (let bound of bounds) {
+            manifest["bounding-box"]["annotations"].push(bound);
+        }
+
+        writeStream.write(JSON.stringify(manifest) + "\r\n");
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 app.whenReady().then(function () {
-	createWindow();
-	takeScreenshot(15);
+    createWindow();
+    takeScreenshot(5);
 });
+
+async function wait(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}

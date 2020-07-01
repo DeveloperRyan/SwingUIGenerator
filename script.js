@@ -4,75 +4,74 @@ const MAIN_CONTAINER = document.getElementById("main-container");
 let labels = [];
 
 function createElements() {
-	let numElements = Math.floor(Math.random() * 5) + 1;
-	let groupDiv = document.createElement("div");
-	groupDiv.className = "mini-container";
+    let numElements = Math.floor(Math.random() * 5) + 1;
+    let groupDiv = document.createElement("div");
+    groupDiv.className = "mini-container";
 
-	for (let i = 0; i < numElements; i++) {
-		let element = chooseElement();
-		groupDiv.appendChild(element);
-	}
+    for (let i = 0; i < numElements; i++) {
+        let element = chooseElement();
+        groupDiv.appendChild(element);
+    }
 
-	MAIN_CONTAINER.appendChild(groupDiv);
+    MAIN_CONTAINER.appendChild(groupDiv);
 
-	getElementBounds(groupDiv);
-	sendLabels();
+    getElementBounds(groupDiv);
 }
 
 function chooseElement() {
-	let randNum = Math.floor(Math.random() * 3) + 1;
-	switch (randNum) {
-		case 1:
-			let paragraph = document.createElement("p");
-			paragraph.innerHTML = createString(Math.floor(Math.random() * 15) + 1);
+    let randNum = Math.floor(Math.random() * 3) + 1;
+    switch (randNum) {
+        case 1:
+            let paragraph = document.createElement("p");
+            paragraph.innerHTML = createString(Math.floor(Math.random() * 15) + 1);
 
-			return paragraph;
-		case 2:
-			let textbox = document.createElement("input");
-			textbox.type = "text";
-			textbox.style.width = `${Math.floor(Math.random() * 150 + 50)}px`;
-			return textbox;
-		case 3:
-			let button = document.createElement("button");
-			button.innerHTML = createString(Math.floor(Math.random() * 10) + 1);
-			return button;
-	}
+            return paragraph;
+        case 2:
+            let textbox = document.createElement("input");
+            textbox.type = "text";
+            textbox.style.width = `${Math.floor(Math.random() * 150 + 50)}px`;
+            return textbox;
+        case 3:
+            let button = document.createElement("button");
+            button.innerHTML = createString(Math.floor(Math.random() * 10) + 1);
+            return button;
+    }
 }
 
 function createInterface(numSections) {
-	for (let i = 0; i < numSections; i++) {
-		createElements();
-	}
+    for (let i = 0; i < numSections; i++) {
+        createElements();
+        sendLabels();
+    }
 }
 
 function createString(length) {
-	let str = "";
-	for (let i = 0; i < length; i++) {
-		str += Math.random().toString(36).substring(2, 3);
-	}
+    let str = "";
+    for (let i = 0; i < length; i++) {
+        str += Math.random().toString(36).substring(2, 3);
+    }
 
-	return str;
+    return str;
 }
 
 function getElementBounds(group) {
-	for (let child of group.children) {
-		let bounds = child.getBoundingClientRect();
-		let data = {
-			type: child.tagName.toLowerCase() === "input" ? "TEXTBOX" : child.tagName,
-			bounds: {
-				top: bounds.top,
-				bottom: bounds.bottom,
-				left: bounds.left,
-				right: bounds.right,
-			},
-		};
+    for (let child of group.children) {
+        if (child.tagName.toLowerCase() == "p") continue; // Don't include the bounds of paragraphs
+        let bounds = child.getBoundingClientRect();
+        let data = {
+            class_id: child.tagName.toLowerCase() === "input" ? 1 : 0,
+            top: Math.round(bounds.top),
+            left: Math.round(bounds.left),
+        };
+        data.height = Math.round(Math.abs(data.top - bounds.bottom));
+        data.width = Math.round(Math.abs(data.left - bounds.right));
 
-		labels.push(data);
-	}
+        labels.push(data);
+    }
 }
 
 function sendLabels() {
-	ipc.send("sendLabels", labels);
+    ipc.send("sendLabels", labels);
 }
 
 createInterface(10);
