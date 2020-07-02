@@ -106,4 +106,7 @@ dist
 # Project specific
 .screenshots/
 
+# Unnecessary data specific files
 *.manifest
+*.png
+*.zip

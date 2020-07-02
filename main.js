@@ -52,8 +52,8 @@ function writeManifest(imageNumber, writeStream, bounds) {
             image_size: [
                 {
                     // Size of the original image
-                    width: 750,
-                    height: 765,
+                    width: 700,
+                    height: 700,
                     depth: 3, // Depth represents the color depth, 3 = RGB.
                 },
             ],
@@ -68,7 +68,7 @@ function writeManifest(imageNumber, writeStream, bounds) {
             1: "textbox",
         };
         manifest["bounding-box-metadata"]["human-annotated"] = "yes";
-        manifest["bounding-box-metadata"]["creation-date"] = Date.now(); // TODO: Make this YYYY-MM-DD HH:MM:SS
+        manifest["bounding-box-metadata"]["creation-date"] = GetFormattedDateTime();
         manifest["bounding-box-metadata"]["job-name"] = "ATAK";
 
         for (let i = 0; i < bounds.length; i++) {
@@ -87,7 +87,7 @@ function writeManifest(imageNumber, writeStream, bounds) {
 
 app.whenReady().then(function () {
     createWindow();
-    takeScreenshot(10);
+    takeScreenshot(500);
 });
 
 async function wait(ms) {
