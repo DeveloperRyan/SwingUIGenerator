@@ -87,7 +87,7 @@ function writeManifest(imageNumber, writeStream, bounds) {
 
 app.whenReady().then(function () {
     createWindow();
-    takeScreenshot(100);
+    takeScreenshot(10);
 });
 
 async function wait(ms) {

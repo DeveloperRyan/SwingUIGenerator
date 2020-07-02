@@ -41,7 +41,6 @@ function chooseElement() {
 function createInterface(numSections) {
     for (let i = 0; i < numSections; i++) {
         createElements();
-        sendLabels();
     }
 }
 
@@ -75,3 +74,4 @@ function sendLabels() {
 }
 
 createInterface(10);
+sendLabels();
