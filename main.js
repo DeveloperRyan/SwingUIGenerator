@@ -2,15 +2,14 @@ const { app, BrowserWindow } = require("electron");
 const ipc = require("electron").ipcMain;
 const fs = require("fs");
 const { spawn } = require("child_process");
-const { electron } = require("process");
 
 let win;
 
 // Create the Electron app window
 function createWindow() {
     win = new BrowserWindow({
-        width: 700,
-        height: 700,
+        width: 1000,
+        height: 1000,
         autoHideMenuBar: true,
         fullscreen: true,
         x: 0,
@@ -52,8 +51,8 @@ function writeManifest(imageNumber, writeStream, bounds) {
             image_size: [
                 {
                     // Size of the original image
-                    width: 700,
-                    height: 700,
+                    width: 1000,
+                    height: 1000,
                     depth: 3, // Depth represents the color depth, 3 = RGB.
                 },
             ],
@@ -87,7 +86,7 @@ function writeManifest(imageNumber, writeStream, bounds) {
 
 app.whenReady().then(function () {
     createWindow();
-    takeScreenshot(500);
+    takeScreenshot(1);
 });
 
 async function wait(ms) {
