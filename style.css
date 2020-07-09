@@ -6,8 +6,8 @@
 
 #main-container {
     display: block;
-    width: 1000px;
-    height: 1000px;
+    width: 700px;
+    height: 700px;
     background-color: #eeeeee;
     position: relative;
 }

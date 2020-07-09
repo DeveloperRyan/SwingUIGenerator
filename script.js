@@ -32,11 +32,13 @@ function chooseElement() {
             let textbox = document.createElement("input");
             textbox.type = "text";
             textbox.style.width = `${Math.floor(Math.random() * 150 + 50)}px`;
+
             return textbox;
         case 3:
             let button = document.createElement("button");
             button.innerHTML = createString(Math.floor(Math.random() * 10) + 1);
             changeHue(button);
+
             return button;
         case 4:
             container = document.createElement("div");
@@ -107,12 +109,12 @@ function changeHue(element) {
 function getElementBounds(group) {
     for (let child of group.children) {
         let tagName = child.tagName.toLowerCase();
-        console.log(tagName);
-        // Don't include the bounds of paragraphs or labels
-        if (tagName === "p" || tagName === "label") continue;
 
         // If the element is a div, select the input element
         if (tagName === "div") child = child.children[0];
+
+        // Don't include the bounds of paragraphs or labels
+        if (tagName === "p") continue;
 
         let bounds = child.getBoundingClientRect();
         let data = {
@@ -120,9 +122,12 @@ function getElementBounds(group) {
             top: Math.round(bounds.top),
             left: Math.round(bounds.left),
         };
+
+        // Declare outside data since they reference info within the object
         data.height = Math.round(Math.abs(data.top - bounds.bottom));
         data.width = Math.round(Math.abs(data.left - bounds.right));
 
+        // Add the data to the array of labels
         labels.push(data);
     }
 }
@@ -137,11 +142,13 @@ function getClassId(element) {
 
     let tagName = element.tagName.toLowerCase();
     // If the element is an input, we need to check the type
+
     if (tagName === "input") {
         let type = element.type;
-        console.log(type);
         return CLASS_IDS[type];
-    } else return CLASS_IDS[tagName];
+    } else {
+        return CLASS_IDS[tagName];
+    }
 }
 
 function sendLabels() {
@@ -149,4 +156,6 @@ function sendLabels() {
 }
 
 createInterface(10);
+
+console.log(labels);
 sendLabels();

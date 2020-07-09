@@ -8,8 +8,8 @@ let win;
 // Create the Electron app window
 function createWindow() {
     win = new BrowserWindow({
-        width: 1000,
-        height: 1000,
+        width: 700,
+        height: 700,
         autoHideMenuBar: true,
         fullscreen: true,
         x: 0,
@@ -18,8 +18,6 @@ function createWindow() {
             nodeIntegration: true,
         },
     });
-
-    win.loadFile("index.html");
 }
 
 // Write all of the label data, call screenshots.py, and reload the page
@@ -27,18 +25,18 @@ async function takeScreenshot(numPhotos) {
     let stream = fs.createWriteStream("labels.manifest", { flags: "a" });
 
     for (let i = 0; i < numPhotos; i++) {
+        win.loadFile("index.html");
         await new Promise((resolve, reject) => {
+            // Wait for the front-end script to send the labels
             ipc.once("sendLabels", async (event, data, err) => {
                 if (err) reject(err);
 
-                writeManifest(i, stream, data);
-                spawn("python", ["screenshot.py", i.toString()]);
+                writeManifest(i, stream, data); // Write the manifest file with the given labels
+                // spawn("python", ["screenshot.py", i.toString()]); // Call the python screenshot script
                 await wait(300);
-
-                resolve();
+                resolve(); // Resolve the promise
             });
         });
-        await win.reload();
     }
 }
 
@@ -51,8 +49,8 @@ function writeManifest(imageNumber, writeStream, bounds) {
             image_size: [
                 {
                     // Size of the original image
-                    width: 1000,
-                    height: 1000,
+                    width: 700,
+                    height: 700,
                     depth: 3, // Depth represents the color depth, 3 = RGB.
                 },
             ],
@@ -65,6 +63,8 @@ function writeManifest(imageNumber, writeStream, bounds) {
         manifest["bounding-box-metadata"]["class-map"] = {
             0: "button",
             1: "textbox",
+            2: "radio",
+            3: "checkbox",
         };
         manifest["bounding-box-metadata"]["human-annotated"] = "yes";
         manifest["bounding-box-metadata"]["creation-date"] = GetFormattedDateTime();
@@ -86,10 +86,10 @@ function writeManifest(imageNumber, writeStream, bounds) {
 
 app.whenReady().then(function () {
     createWindow();
-    takeScreenshot(1);
+    takeScreenshot(3);
 });
 
-async function wait(ms) {
+function wait(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
