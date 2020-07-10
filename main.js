@@ -25,15 +25,16 @@ async function takeScreenshot(numPhotos) {
     let stream = fs.createWriteStream("labels.manifest", { flags: "a" });
 
     for (let i = 0; i < numPhotos; i++) {
-        win.loadFile("index.html");
         await new Promise((resolve, reject) => {
+            win.loadFile("index.html");
+
             // Wait for the front-end script to send the labels
             ipc.once("sendLabels", async (event, data, err) => {
                 if (err) reject(err);
 
                 writeManifest(i, stream, data); // Write the manifest file with the given labels
-                // spawn("python", ["screenshot.py", i.toString()]); // Call the python screenshot script
-                await wait(300);
+                spawn("python", ["screenshot.py", i.toString()]); // Call the python screenshot script
+                await wait(325);
                 resolve(); // Resolve the promise
             });
         });
@@ -86,7 +87,7 @@ function writeManifest(imageNumber, writeStream, bounds) {
 
 app.whenReady().then(function () {
     createWindow();
-    takeScreenshot(3);
+    takeScreenshot(500);
 });
 
 function wait(ms) {
