@@ -108,5 +108,4 @@ dist
 
 # Unnecessary data specific files
 *.manifest
-*.png
 *.zip

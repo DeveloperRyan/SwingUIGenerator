@@ -34,7 +34,7 @@ async function takeScreenshot(numPhotos) {
 
                 writeManifest(i, stream, data); // Write the manifest file with the given labels
                 spawn("python", ["screenshot.py", i.toString()]); // Call the python screenshot script
-                await wait(325);
+                await wait(350);
                 resolve(); // Resolve the promise
             });
         });
@@ -68,11 +68,15 @@ function writeManifest(imageNumber, writeStream, bounds) {
             3: "checkbox",
         };
         manifest["bounding-box-metadata"]["human-annotated"] = "yes";
-        manifest["bounding-box-metadata"]["creation-date"] = GetFormattedDateTime();
+        manifest["bounding-box-metadata"][
+            "creation-date"
+        ] = GetFormattedDateTime();
         manifest["bounding-box-metadata"]["job-name"] = "ATAK";
 
         for (let i = 0; i < bounds.length; i++) {
-            manifest["bounding-box-metadata"]["objects"].push({ confidence: 1 });
+            manifest["bounding-box-metadata"]["objects"].push({
+                confidence: 1,
+            });
         }
 
         for (let bound of bounds) {
@@ -87,7 +91,7 @@ function writeManifest(imageNumber, writeStream, bounds) {
 
 app.whenReady().then(function () {
     createWindow();
-    takeScreenshot(500);
+    takeScreenshot(1);
 });
 
 function wait(ms) {

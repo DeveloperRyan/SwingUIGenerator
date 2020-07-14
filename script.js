@@ -23,59 +23,67 @@ function chooseElement() {
 
     let id, label, container;
     switch (randNum) {
-        case 1:
+        case 1: // Paragraph
             let paragraph = document.createElement("p");
-            paragraph.innerHTML = createString(Math.floor(Math.random() * 15) + 1);
+            paragraph.innerHTML = createString(
+                Math.floor(Math.random() * 15) + 1
+            );
 
             return paragraph;
-        case 2:
+        case 2: // Textbox
             let textbox = document.createElement("input");
             textbox.type = "text";
             textbox.style.width = `${Math.floor(Math.random() * 150 + 50)}px`;
 
             return textbox;
-        case 3:
+        case 3: // Button
             let button = document.createElement("button");
             button.innerHTML = createString(Math.floor(Math.random() * 10) + 1);
-            changeHue(button);
+            changeBackgroundHue(button);
 
             return button;
-        case 4:
+        case 4: // Radio
             container = document.createElement("div");
             container.className = "radio-container";
 
-            let radio = document.createElement("input");
-            id = createString(Math.floor(Math.random() * 7) + 1); // Create an id for the label
+            let radio = document.createElement("img");
+            radio.height = "12";
+            radio.width = "12";
+            radio.class = "radio";
 
-            radio.id = id;
-            radio.type = "radio";
-            radio.checked = Math.random() > 0.5;
+            Math.random() > 0.5
+                ? (radio.src = "./assets/r-selected.png")
+                : (radio.src = "./assets/r-unselected.png");
 
-            label = document.createElement("label");
-            label.innerHTML = id;
-            label.setAttribute("for", id);
+            changeImageHue(radio);
+
+            text = document.createElement("p");
+            text.innerHTML = createString(Math.floor(Math.random() * 7) + 1);
 
             container.appendChild(radio);
-            container.appendChild(label);
+            container.appendChild(text);
 
             return container;
-        case 5:
+        case 5: // Checkbox
             container = document.createElement("div");
             container.className = "checkbox-container";
 
-            let checkbox = document.createElement("input");
-            id = createString(Math.floor(Math.random() * 7) + 1); // Create an id for the label
+            let cb = document.createElement("img");
+            cb.height = "13";
+            cb.width = "13";
+            cb.class = "checkbox";
 
-            checkbox.id = id;
-            checkbox.type = "checkbox";
-            checkbox.checked = Math.random() > 0.5;
+            Math.random() > 0.5
+                ? (cb.src = "./assets/cb-checked.png")
+                : (cb.src = "./assets/cb-unchecked.png");
 
-            label = document.createElement("label");
-            label.innerHTML = id;
-            label.setAttribute("for", id);
+            changeImageHue(cb);
 
-            container.appendChild(checkbox);
-            container.appendChild(label);
+            text = document.createElement("p");
+            text.innerHTML = createString(Math.floor(Math.random() * 7) + 1);
+
+            container.appendChild(cb);
+            container.appendChild(text);
 
             return container;
     }
@@ -96,7 +104,7 @@ function createString(length) {
     return str;
 }
 
-function changeHue(element) {
+function changeBackgroundHue(element) {
     let hue = Math.floor(Math.random() * 361);
     element.style.background = `linear-gradient(
         0deg,
@@ -104,6 +112,12 @@ function changeHue(element) {
         hsl(0, 0%, 100%) 75%,
         hsl(${hue}, 44%, 83%) 100%
     )`;
+}
+
+function changeImageHue(element) {
+    let hue = Math.floor(Math.random() * 361);
+    element.style.filter = `hue-rotate(${hue}deg)`;
+    element.setAttribute("style", `-webkit-filter: hue-rotate(${hue}deg)`);
 }
 
 function getElementBounds(group) {
@@ -145,6 +159,9 @@ function getClassId(element) {
 
     if (tagName === "input") {
         let type = element.type;
+        return CLASS_IDS[type];
+    } else if (tagName === "img") {
+        let type = element.class;
         return CLASS_IDS[type];
     } else {
         return CLASS_IDS[tagName];

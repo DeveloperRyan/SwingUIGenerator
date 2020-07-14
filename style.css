@@ -61,3 +61,14 @@ input[type="text"]:focus {
 label {
     margin-left: 5px;
 }
+
+.radio-container,
+.checkbox-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.radio-container img,
+.checkbox-container img {
+    margin-right: 6px;
+}
