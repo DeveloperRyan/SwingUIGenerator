@@ -4,7 +4,7 @@
   "description": "A basic app to generate swing-like GUI's for AI training purposes",
   "main": "main.js",
   "dependencies": {
-    "electron": "^9.0.4"
+    "electron": "^11.5.0"
   },
   "devDependencies": {},
   "scripts": {
